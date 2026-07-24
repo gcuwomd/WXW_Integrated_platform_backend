@@ -4,8 +4,8 @@ import lombok.Data;
 
 @Data
 public class MessagePerson {
-    private  String id;
-    private String username;
-    private  String departmentName;
+    private String student_id;
+    private String user_name;
+    private String departmentName;
     private String phone;
 }

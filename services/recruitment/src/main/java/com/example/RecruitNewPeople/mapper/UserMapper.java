@@ -2,6 +2,7 @@ package com.example.RecruitNewPeople.mapper;
 
 import com.example.RecruitNewPeople.entity.pojo.*;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,7 +91,9 @@ public interface UserMapper {
 
     UserGetById userGetById(String id);
 
-    void registerUser(String id, String username, String introduction, String major, String college, String gender, String phone);
+    void registerUser(String student_id, String user_name, String introduction, String major, String college, String first_intention, String second_intention, String gender, String phone);
+
+    void insertVolunteer(@Param("id") String id, @Param("departmentId") String departmentId, @Param("level") String level);
 
     void InsertStatus(String id, String departmentId);
 

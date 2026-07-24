@@ -10,9 +10,9 @@ import org.springframework.stereotype.Repository;
 @EqualsAndHashCode
 public class ReadExcel {
     @ExcelProperty(value = "学号",index = 6)
-    private String id;
+    private String student_id;
     @ExcelProperty(value = "姓名",index = 7)
-    private String username;
+    private String user_name;
     @ExcelProperty(value = "性别",index = 8)
     private String gender;
     @ExcelProperty(value = "学院",index = 9)
@@ -22,9 +22,9 @@ public class ReadExcel {
     @ExcelProperty(value = "联系方式",index = 11)
     private String phone;
     @ExcelProperty(value = "第一志愿部门",index = 12)
-    private String departmentName1;
+    private String first_intention;
     @ExcelProperty(value = "第二志愿部门",index = 13)
-    private String departmentName2;
+    private String second_intention;
     @ExcelProperty(value = "自我介绍",index = 14)
     private String introduction;
 }

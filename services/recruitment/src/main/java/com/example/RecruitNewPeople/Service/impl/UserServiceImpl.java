@@ -66,24 +66,45 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean register(JSONObject json) {
-        String id = json.getString("id");
-        String username = json.getString("username");
+        String student_id = json.getString("student_id");
+        String user_name = json.getString("username");
         String introduction = json.getString("introduction");
         String major = json.getString("major");
         String college = json.getString("college");
         String gender = json.getString("gender");
         String phone = json.getString("phone");
-        JSONArray volunteerArray = json.getJSONArray("volunteer");
+        String first_intention = json.getString("firstIntention");
+        String second_intention = json.getString("secondIntention");
 
-        userMapper.registerUser(id, username, introduction, major, college, gender, phone);
-        userMapper.deleteVolunteer(id);
-        userMapper.insertVolunteerList(volunteerArray,id);
-        for (Object item : volunteerArray) {
-            JSONObject object = (JSONObject) JSON.toJSON(item);
-            Integer level = Integer.parseInt(object.getString("level"));
-            if (level == 1) {
-                userMapper.InsertStatus(id,object.getString("departmentId"));
+        userMapper.registerUser(student_id, user_name, introduction, major, college, first_intention, second_intention, gender, phone);
+        // 优先处理volunteer数组格式（前端新格式）
+        JSONArray volunteerArray = json.getJSONArray("volunteer");
+        String firstDeptId = null;
+        if (volunteerArray != null && !volunteerArray.isEmpty()) {
+            for (int i = 0; i < volunteerArray.size(); i++) {
+                JSONObject volItem = volunteerArray.getJSONObject(i);
+                String level = volItem.getString("level");
+                String departmentId = volItem.getString("departmentId");
+                if (departmentId != null && !departmentId.isEmpty()) {
+                    userMapper.insertVolunteer(student_id, departmentId, level);
+                    if (firstDeptId == null) {
+                        firstDeptId = departmentId;
+                    }
+                }
             }
+        } else {
+            // 兼容旧的firstIntention/secondIntention格式
+            if (first_intention != null && !first_intention.isEmpty()) {
+                userMapper.insertVolunteer(student_id, first_intention, "1");
+                firstDeptId = first_intention;
+            }
+            if (second_intention != null && !second_intention.isEmpty()) {
+                userMapper.insertVolunteer(student_id, second_intention, "2");
+            }
+        }
+        // 写入status表，取第一志愿作为department_id，状态默认为0（未处理）
+        if (firstDeptId != null && !firstDeptId.isEmpty()) {
+            userMapper.InsertStatus(student_id, firstDeptId);
         }
         return true;
     }
@@ -92,10 +113,17 @@ public class UserServiceImpl implements UserService {
     public JSONObject getUserByIp(String id){
         UserGetById userGetById = userMapper.userGetById(id);
 
-        List<UpdateVolunteer> volunteers = userMapper.getVolunteers(id);
-
         JSONObject json = (JSONObject) JSON.toJSON(userGetById);
-        json.put("volunteer", volunteers);
+        // 从volunteer表获取志愿信息并拼装
+        JSONArray volunteerArray = new JSONArray();
+        List<Volunteer> volunteerList = userMapper.getVolunteer(id);
+        for (Volunteer v : volunteerList) {
+            JSONObject volObj = new JSONObject();
+            volObj.put("level", v.getLevel());
+            volObj.put("departmentId", v.getDepartmentId());
+            volunteerArray.add(volObj);
+        }
+        json.put("volunteer", volunteerArray);
         return json;
     }
 
@@ -103,7 +131,7 @@ public class UserServiceImpl implements UserService {
     @Transactional(rollbackFor = Exception.class)
     public void updateUserInfo(Users updatedUser, ArrayList updatedVolunteerList) {
         userMapper.updateUser(updatedUser);
-        String id = updatedUser.getId();
+        String id = updatedUser.getStudent_id();
         for (Object item : updatedVolunteerList) {
             JSONObject object = (JSONObject) JSON.toJSON(item);
             Integer level = Integer.parseInt(object.getString("level"));
@@ -170,18 +198,21 @@ public class UserServiceImpl implements UserService {
         JSONArray array_userInfo = new JSONArray();
         for (Object item : list) {
             JSONObject personSingle = (JSONObject) JSON.toJSON((Users) item);
-            JSONObject volunteer = new JSONObject();
+            JSONArray volunteerArray = new JSONArray();
             JSONObject image = new JSONObject();
-            List list_volunteer = userMapper.getVolunteer(((Users) item).getId());
+            List list_volunteer = userMapper.getVolunteer(((Users) item).getStudent_id());
             for (Object user : list_volunteer) {
-                volunteer.put(((Volunteer) user).getLevel(), ((Volunteer) user).getDepartmentName());
+                JSONObject volObj = new JSONObject();
+                volObj.put("level", ((Volunteer) user).getLevel());
+                volObj.put("departmentId", ((Volunteer) user).getDepartmentId());
+                volunteerArray.add(volObj);
             }
-            List list_image = userMapper.getImageById(((Users) item).getId());
+            List list_image = userMapper.getImageById(((Users) item).getStudent_id());
             int i = 1;
             for (Object images : list_image) {
                 image.put((Integer.toString(i++)), (((Image) images).getUrl()));
             }
-            personSingle.put("volunteer", volunteer);
+            personSingle.put("volunteer", volunteerArray);
             personSingle.put("image", image);
             array_userInfo.add(personSingle);
 

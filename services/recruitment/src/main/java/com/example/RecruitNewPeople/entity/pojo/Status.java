@@ -4,6 +4,7 @@ import lombok.Data;
 
 @Data
 public class Status {
+    private Integer pkId;
     private String id;
     private String departmentName;
     private String status;

@@ -5,7 +5,6 @@ import com.alibaba.fastjson.JSON;
 import com.example.RecruitNewPeople.Service.DepartmentService;
 import com.example.RecruitNewPeople.mapper.DepartmentMapper;
 import com.example.RecruitNewPeople.utils.JwtUtils;
-import com.example.RecruitNewPeople.utils.RedisUtil;
 import com.example.RecruitNewPeople.utils.ResultUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,8 +19,6 @@ public class DepartmentController {
     DepartmentMapper departmentMapper;
     @Autowired
     DepartmentService department;
-    @Autowired
-    RedisUtil redisUtil;
 @GetMapping("/user/pass")
     ResultUtil pass(@RequestParam String departmentId){
     if (!( departmentMapper.departmentExist(departmentId)))

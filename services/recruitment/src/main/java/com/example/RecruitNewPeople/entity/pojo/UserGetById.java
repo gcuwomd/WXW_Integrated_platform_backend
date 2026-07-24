@@ -6,13 +6,14 @@ import java.util.List;
 
 @Data
 public class UserGetById {
-    private String username;
-    private String id;
+    private String user_name;
+    private String student_id;
     private String introduction;
     private String major;
     private String college;
+    private String first_intention;
+    private String second_intention;
     private String phone;
     private String gender;
-    private List<Volunteer> volunteer;
     private List<Image> images;
 }

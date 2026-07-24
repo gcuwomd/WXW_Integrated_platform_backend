@@ -5,13 +5,15 @@
 <mapper namespace="com.example.RecruitNewPeople.mapper.ListenerMapper">
 
     <insert id="insertRecruitUser">
-        INSERT INTO recruit_user (id, username, introduction, major, college, phone, gender)
-        VALUES (#{id}, #{username}, #{introduction}, #{major}, #{college}, #{phone}, #{gender})
+        INSERT INTO recruit_user (student_id, user_name, introduction, major, college, first_intention, second_intention, phone, gender)
+        VALUES (#{student_id}, #{user_name}, #{introduction}, #{major}, #{college}, #{first_intention}, #{second_intention}, #{phone}, #{gender})
             ON DUPLICATE KEY UPDATE
-                                 username = username,
+                                 user_name = user_name,
                                  introduction = introduction,
                                  major = major,
                                  college = college,
+                                 first_intention = first_intention,
+                                 second_intention = second_intention,
                                  phone = phone,
                                  gender = gender;
     </insert>

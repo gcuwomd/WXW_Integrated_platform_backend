@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class Volunteer {
-    private  String departmentName;
+    private  String departmentId;
     private  String level;
 }

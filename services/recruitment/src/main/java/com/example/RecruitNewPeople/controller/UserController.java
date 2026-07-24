@@ -86,8 +86,8 @@ public class UserController {
         String ip = "test";
 //                request.getHeader("X-Real-IP");
 
-        String id = json.getString("id");
-        userMapper.postIp(ip, id);
+        String student_id = json.getString("student_id");
+        userMapper.postIp(ip, student_id);
         if (user.register(json)) {
             return ResultUtil.success();
         }
